@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Use `set -u` to throw errors if we reference null env vars
+set -u
+
+# If we see any argument, set things up for local use
+if [ $# = 1 ]; then
+  volume="-v $(pwd):/app"
+  port="-p 389:389"
+else
+  volume=""
+  port=""
+fi
+
+docker rm -f ldap_server
+docker network create ldap
+docker build -t ldap_server -f Dockerfile .
+docker run $volume $port --name=ldap_server --net="ldap" -tid ldap_server
